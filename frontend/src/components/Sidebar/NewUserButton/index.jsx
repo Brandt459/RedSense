@@ -13,14 +13,42 @@ import {
     ModalCloseButton,
     Box,
     Heading,
-    Input 
+    Input,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    Flex
 } from "@chakra-ui/react"
 import { FaPlus } from "react-icons/fa6"
 import { FaUserPlus } from "react-icons/fa"
 
 
-export default function index() {
+export default function index({ users, setUsers }) {
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const [username, setUsername] = useState('')
+    const [error, setError] = useState('')
+
+    const handleClose = () => {
+        onClose()
+        setUsername('')
+        setError('')
+    }
+
+    const getUserInfo = (e) => {
+        e.preventDefault()
+
+        if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
+            setError('Username already in list of users!')
+        } else {
+            const user = {
+                username: username,
+                pfp: "pfp.png"
+            }
+
+            setUsers(prev => [ ...prev, user ])
+            handleClose()
+        }
+    }
 
     return (
         <>
@@ -45,7 +73,7 @@ export default function index() {
             </Button>
             <Modal 
                 isOpen={isOpen} 
-                onClose={onClose}
+                onClose={handleClose}
                 isCentered
             >
                 <ModalOverlay />
@@ -77,36 +105,55 @@ export default function index() {
                         >
                             Please enter the username of a Twitter / X user
                         </Text>
-                        <Box
-                            mt="4"
+                        <form
+                            onSubmit={getUserInfo}
                         >
-                            <Text>
-                                Username
-                            </Text>
-                            <Input 
-                                placeholder="e.g. elonmusk"
-                            />
-                        </Box>
+                            <FormControl 
+                                isInvalid={error}
+                            >
+                                <Box
+                                    mt="4"
+                                >
+                                    <FormLabel 
+                                        htmlFor="username-input"
+                                    >
+                                        Username
+                                    </FormLabel>
+                                    <Input 
+                                        placeholder="e.g. elonmusk"
+                                        value={username}
+                                        onInput={e => setUsername(e.target.value)}
+                                    />
+                                    {error && 
+                                        <FormErrorMessage>
+                                            {error}
+                                        </FormErrorMessage>
+                                    }
+                                </Box>
+                            </FormControl>
+                            <Flex
+                                gap="4"
+                                mt="4"
+                                justifyContent="end"
+                            >
+                                <Button 
+                                    variant='outline'
+                                    w="1/2"
+                                    onClick={handleClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button 
+                                    colorScheme='blue'
+                                    bg="brightBlue"
+                                    w="1/2"
+                                    type="submit"
+                                >
+                                    Confirm
+                                </Button>
+                            </Flex>
+                        </form>
                     </ModalBody>
-                    <ModalFooter
-                        gap="4"
-                    >
-                        <Button 
-                            variant='outline'
-                            w="1/2"
-                            onClick={onClose}
-                        >
-                            Cancel
-                        </Button>
-                        <Button 
-                            colorScheme='blue'
-                            bg="brightBlue"
-                            w="1/2"
-                            onClick={onClose}
-                        >
-                            Confirm
-                        </Button>
-                    </ModalFooter>
                 </ModalContent>
             </Modal>
         </>
