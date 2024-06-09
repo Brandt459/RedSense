@@ -1,0 +1,7 @@
+flask
+python-dotenv
+praw
+vadersentiment
+transformers
+torch
+numpy
