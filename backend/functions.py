@@ -5,6 +5,8 @@ import torch
 import numpy as np
 from typing import List
 from client import reddit
+from db import db
+from models import RedditUser, TopicDistribution, TopicSentiment
 
 
 analyzer = SentimentIntensityAnalyzer()
@@ -93,12 +95,42 @@ def analyze_user_posts(username: str) -> dict:
     
     # Infer Myers-Briggs personality type
     #mbti = infer_mbti(all_texts)
+
+    # Check if RedditUser exists, otherwise create
+    reddit_user = RedditUser.query.filter_by(username=username).first()
+    if not reddit_user:
+        reddit_user = RedditUser(username=username, num_submissions=len(submissions))
+        db.session.add(reddit_user)
+        db.session.commit()
+    
+    # Store topic distributions
+    for topic, distribution in topic_counter.items():
+        topic_distribution = TopicDistribution(user_id=reddit_user.id, topic=topic, distribution=distribution)
+        db.session.add(topic_distribution)
+    
+    # Store average sentiments
+    for topic, sentiment in average_sentiment.items():
+        topic_sentiment = TopicSentiment(user_id=reddit_user.id, topic=topic, sentiment=sentiment)
+        db.session.add(topic_sentiment)
+    
+    db.session.commit()
+
+
+def get_user_analysis(username):
+    reddit_user = RedditUser.query.filter_by(username=username).first()
+    
+    # Retrieve topic distributions from database
+    topics_distribution = TopicDistribution.query.filter_by(user_id=reddit_user.id).all()
+    topics_distribution_dict = {td.topic: td.distribution for td in topics_distribution}
+    
+    # Retrieve topic sentiments from database
+    topic_sentiments = TopicSentiment.query.filter_by(user_id=reddit_user.id).all()
+    topic_sentiments_dict = {ts.topic: ts.sentiment for ts in topic_sentiments}
     
     result = {
-        'topics_distribution': dict(topic_counter),
-        'average_sentiment_by_topic': average_sentiment,
-        #'mbti': mbti,
-        'total_submissions': len(submissions)
+        'topics_distribution': topics_distribution_dict,
+        'average_sentiment_by_topic': topic_sentiments_dict,
+        'total_submissions': reddit_user.num_submissions
     }
     
     return result

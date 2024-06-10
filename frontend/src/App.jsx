@@ -1,18 +1,32 @@
+import { useState } from "react"
 import {
-    Box
+    Flex
 } from "@chakra-ui/react"
 import Sidebar from './components/Sidebar'
+import UserAnalysis from './components/UserAnalysis'
 
 
 function App() {
+    const [selectedUser, setSelectedUser] = useState()
+    const [selectedUserInfo, setSelectedUserInfo] = useState()
+
     return (
-        <Box
+        <Flex
             bg="darkerBlue"
             w="100vw"
             h="100vh"
         >
-            <Sidebar />
-        </Box>
+            <Sidebar 
+                selectedUser={selectedUser}
+                setSelectedUser={setSelectedUser}
+                setSelectedUserInfo={setSelectedUserInfo}
+            />
+            <UserAnalysis 
+                selectedUser={selectedUser}
+                setSelectedUser={setSelectedUser}
+                selectedUserInfo={selectedUserInfo}
+            />
+        </Flex>
     )
 }
 

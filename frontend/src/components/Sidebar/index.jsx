@@ -5,27 +5,28 @@ import {
     Heading,
     Center,
     Divider,
-    VStack,
-    Text,
-    Image
+    VStack
 } from "@chakra-ui/react"
 import NewUserButton from './NewUserButton'
 import useLocalStorage from 'use-local-storage'
 import axios from 'axios'
+import UserCard from '../UserCard'
 
 
-export default function index() {
+export default function index({ selectedUser, setSelectedUser, setSelectedUserInfo }) {
     const [users, setUsers] = useLocalStorage('users', [])
-    const [selectedUser, setSelectedUser] = useState()
 
     useEffect(() => {
         if (selectedUser && selectedUser.username) {
-            axios.get(`${import.meta.env.VITE_API_URL}/analyze_user`, {
+            axios.get(`${import.meta.env.VITE_API_URL}/user`, {
                 params: {
                     username: selectedUser.username
                 }
             })
-            .then(res => console.log(res.data))
+            .then(res => {
+                console.log(res.data)
+                setSelectedUserInfo(res.data)
+            })
         }
     }, [selectedUser])
 
@@ -74,35 +75,11 @@ export default function index() {
                 mt="4"
             >
                 {users.map(user => (
-                    <Flex
-                        key={user.username}
-                        w="200px"
-                        h="50px"
-                        gap="4"
-                        p="4"
-                        rounded="md"
-                        color="white"
-                        alignItems="center"
-                        cursor="pointer"
-                        backgroundColor={(selectedUser && selectedUser.username === user.username) ? "rgba(72, 128, 255, 1)" : "rgba(72, 128, 255, 0)"}
-                        _hover={{
-                            backgroundColor: (selectedUser && selectedUser.username === user.username) ? "rgba(72, 128, 255, 1)" : "rgba(72, 128, 255, 0.5)"
-                        }}
-                        transitionProperty="background-color"
-                        transitionDuration="0.3s"
-                        transitionTimingFunction="ease-in-out"
-                        onClick={() => setSelectedUser(user)}
-                    >
-                        <Image 
-                            src={user.pfp}
-                            alt={`${user.username}'s profile picture`}
-                            w="10"
-                            h="10"
-                        />
-                        <Text>
-                            @{user.username}
-                        </Text>
-                    </Flex>
+                    <UserCard 
+                        user={user}
+                        selectedUser={selectedUser}
+                        setSelectedUser={setSelectedUser}
+                    />
                 ))}
             </VStack>
         </Box>

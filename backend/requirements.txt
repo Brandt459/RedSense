@@ -5,3 +5,5 @@ vadersentiment
 transformers
 torch
 numpy
+Flask-SQLAlchemy
+Flask-Migrate
