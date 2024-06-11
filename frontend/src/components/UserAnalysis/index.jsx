@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react"
 import UserCard from '../UserCard'
 import { FaUser } from "react-icons/fa6"
+import Plot from "react-plotly.js"
 
 
 export default function index({ selectedUser, setSelectedUser, selectedUserInfo }) {
@@ -123,6 +124,27 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                 </Box>
                             </Flex>
                         </VStack>
+                        {selectedUserInfo?.topics_distribution &&
+                            <Box>
+                                <Plot 
+                                    data={[{
+                                        values: Object.values(selectedUserInfo.topics_distribution),
+                                        labels: Object.keys(selectedUserInfo.topics_distribution),
+                                        type: "pie",
+                                        textinfo: "label+percent",
+                                        insidetextfont: { color: "white" }
+                                    }]}
+                                    layout={{
+                                        width: 400,
+                                        height: 400,
+                                        color: "#e5e7eb",
+                                        paper_bgcolor: 'rgba(0,0,0,0)',
+                                        plot_bgcolor: 'rgba(0,0,0,0)',
+                                        showlegend: false
+                                    }}
+                                />
+                            </Box>
+                        }
                     </Flex>
                 </>
             }

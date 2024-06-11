@@ -103,7 +103,7 @@ export default function index({ users, setUsers }) {
                         <Text
                             fontSize="14px"
                         >
-                            Please enter the username of a Twitter / X user
+                            Please enter the username of a Reddit user
                         </Text>
                         <form
                             onSubmit={getUserInfo}
