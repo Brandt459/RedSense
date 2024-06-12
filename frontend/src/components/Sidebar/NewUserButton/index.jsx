@@ -21,6 +21,7 @@ import {
 } from "@chakra-ui/react"
 import { FaPlus } from "react-icons/fa6"
 import { FaUserPlus } from "react-icons/fa"
+import axios from 'axios'
 
 
 export default function index({ users, setUsers }) {
@@ -40,13 +41,23 @@ export default function index({ users, setUsers }) {
         if (users.some(user => user.username.toLowerCase() === username.toLowerCase())) {
             setError('Username already in list of users!')
         } else {
-            const user = {
-                username: username,
-                pfp: "pfp.png"
-            }
-
-            setUsers(prev => [ ...prev, user ])
-            handleClose()
+            axios.get(`${import.meta.env.VITE_API_URL}/profile-photo`, {
+                params: {
+                    username: username
+                }
+            })
+            .then(res => {
+                const user = {
+                    username: username,
+                    pfp: res.data.profile_photo_url ?? "pfp.png"
+                }
+    
+                setUsers(prev => [ ...prev, user ])
+                handleClose()
+            })
+            .catch(error => {
+                console.log(error)
+            })
         }
     }
 

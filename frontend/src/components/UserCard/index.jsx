@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Flex,
     Text,
@@ -7,6 +7,8 @@ import {
 
 
 export default function index({ user, selectedUser, setSelectedUser }) {
+    const [imgSrc, setImgSrc] = useState(user?.pfp ?? "pfp.png")
+
     return (
         <Flex
             key={user.username}
@@ -28,12 +30,17 @@ export default function index({ user, selectedUser, setSelectedUser }) {
             onClick={() => setSelectedUser(user)}
         >
             <Image 
-                src={user.pfp}
+                src={imgSrc}
                 alt={`${user.username}'s profile picture`}
                 w="10"
                 h="10"
+                borderRadius="full"
+                onError={() => setImgSrc("pfp.png")}
             />
-            <Text>
+            <Text
+                isTruncated
+                title={`@${user.username}`}
+            >
                 @{user.username}
             </Text>
         </Flex>

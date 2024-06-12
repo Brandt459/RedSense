@@ -15,6 +15,7 @@ function App() {
             bg="darkerBlue"
             w="100vw"
             h="100vh"
+            overflow="auto"
         >
             <Sidebar 
                 selectedUser={selectedUser}

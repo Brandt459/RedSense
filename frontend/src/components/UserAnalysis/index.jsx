@@ -58,9 +58,9 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                         bg="darkBlue"
                                         borderWidth="1px"
                                         borderColor="slateBlue"
-                                        gap="20"
                                         w="64"
                                         h="28"
+                                        justifyContent="space-between"
                                     >
                                         <Box>
                                             <Text
@@ -99,9 +99,9 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                         bg="darkBlue"
                                         borderWidth="1px"
                                         borderColor="slateBlue"
-                                        gap="20"
                                         w="64"
                                         h="28"
+                                        justifyContent="space-between"
                                     >
                                         <Box>
                                             <Text
@@ -109,7 +109,7 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                                 fontWeight="semibold"
                                                 fontSize="16px"
                                             >
-                                                Total Posts
+                                                # Posts Analyzed
                                             </Text>
                                             <Text
                                                 color="white"
@@ -215,6 +215,7 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                                             Object.keys(selectedUserInfo.average_sentiment_by_topic).map(key => (
                                                                 <Text
                                                                     color="white"
+                                                                    key={key}
                                                                 >
                                                                     {key}
                                                                 </Text>
@@ -227,9 +228,10 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                                         spacing="1"
                                                     >
                                                         {selectedUserInfo?.average_sentiment_by_topic &&
-                                                            Object.values(selectedUserInfo.average_sentiment_by_topic).map(value => (
+                                                            Object.entries(selectedUserInfo.average_sentiment_by_topic).map(([key, value]) => (
                                                                 <Text
                                                                     color={value === 0 ? "gray" : value > 0 ? "#00ff00" : "#ff0000"}
+                                                                    key={key}
                                                                 >
                                                                     {value === 0 ? 
                                                                         "Neutral" 

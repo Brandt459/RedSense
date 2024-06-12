@@ -36,6 +36,7 @@ export default function index({ selectedUser, setSelectedUser, setSelectedUserIn
             bg="darkBlue"
             h="full"
             w="2xs"
+            overflow="auto"
         >
             <Flex
                 alignContent="center"
@@ -74,12 +75,14 @@ export default function index({ selectedUser, setSelectedUser, setSelectedUserIn
             <VStack
                 spacing="2"
                 mt="4"
+                overflow="auto"
             >
                 {users.map(user => (
                     <UserCard 
                         user={user}
                         selectedUser={selectedUser}
                         setSelectedUser={setSelectedUser}
+                        key={user.username}
                     />
                 ))}
             </VStack>
