@@ -12,9 +12,13 @@ import {
 import UserCard from '../UserCard'
 import { FaUser } from "react-icons/fa6"
 import Plot from "react-plotly.js"
+import { BsEmojiLaughingFill, BsEmojiSmileFill, BsEmojiNeutralFill, BsEmojiFrownFill, BsEmojiAngryFill } from "react-icons/bs"
 
 
 export default function index({ selectedUser, setSelectedUser, selectedUserInfo }) {
+    selectedUserInfo = {}
+    selectedUserInfo.overall_average_sentiment = 0
+
     return (
         <Box
             h="full"
@@ -68,7 +72,7 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                                 fontWeight="semibold"
                                                 fontSize="16px"
                                             >
-                                                Personality
+                                                # Posts Analyzed
                                             </Text>
                                             <Text
                                                 color="white"
@@ -76,7 +80,7 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                                 fontSize="28px"
                                                 mt="2"
                                             >
-                                                ENTP
+                                                {selectedUserInfo?.total_submissions}
                                             </Text>
                                         </Box>
                                         <Box
@@ -109,28 +113,42 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                                 fontWeight="semibold"
                                                 fontSize="16px"
                                             >
-                                                # Posts Analyzed
+                                                Overall Attitude
                                             </Text>
-                                            <Text
-                                                color="white"
-                                                fontWeight="bold"
-                                                fontSize="28px"
-                                                mt="2"
-                                            >
-                                                {selectedUserInfo?.total_submissions}
-                                            </Text>
+                                            {selectedUserInfo?.overall_average_sentiment &&
+                                                <Text
+                                                    fontWeight="bold"
+                                                    fontSize="28px"
+                                                    mt="2"
+                                                    color={
+                                                        selectedUserInfo.overall_average_sentiment === 0 ? "gray" : 
+                                                        selectedUserInfo.overall_average_sentiment > 0 ? "#00ff00" : "#ff0000"
+                                                    }
+                                                >
+                                                    {selectedUserInfo.overall_average_sentiment === 0 ? 
+                                                        "Neutral" 
+                                                        :
+                                                        `${selectedUserInfo.overall_average_sentiment > 0 ? '+' : '-'}${parseFloat(Math.abs(selectedUserInfo.overall_average_sentiment * 100).toFixed(2))}%`
+                                                    }
+                                                </Text>
+                                            }
                                         </Box>
                                         <Box
-                                            bg="purple"
-                                            p="4"
-                                            borderRadius="25%"
-                                            w="14"
-                                            h="14"
+                                            p="2"
                                         >
                                             <Icon
-                                                as={FaUser}
-                                                color="white"
-                                                boxSize="6"
+                                                as={
+                                                    !!selectedUserInfo?.overall_average_sentiment ? BsEmojiNeutralFill :
+                                                    selectedUserInfo.overall_average_sentiment >= 0.5 ? BsEmojiLaughingFill :
+                                                    selectedUserInfo.overall_average_sentiment > 0 ? BsEmojiSmileFill :
+                                                    selectedUserInfo.overall_average_sentiment === 0 ? BsEmojiNeutralFill :
+                                                    selectedUserInfo.overall_average_sentiment > -0.5 ? BsEmojiFrownFill : BsEmojiAngryFill
+                                                }
+                                                color={
+                                                    selectedUserInfo.overall_average_sentiment === 0 ? "gray" : 
+                                                    selectedUserInfo.overall_average_sentiment > 0 ? "#00ff00" : "#ff0000"
+                                                }
+                                                boxSize="10"
                                             />
                                         </Box>
                                     </Flex>
@@ -236,7 +254,7 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                                                     {value === 0 ? 
                                                                         "Neutral" 
                                                                         :
-                                                                        `${Math.abs(value * 100)}% ${value > 0 ? 'Positive' : 'Negative'}`
+                                                                        `${value > 0 ? '+' : '-'}${parseFloat(Math.abs(value * 100).toFixed(2))}%`
                                                                     }
                                                                 </Text>
                                                             ))

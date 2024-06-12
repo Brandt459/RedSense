@@ -92,16 +92,24 @@ def analyze_user_posts(username: str) -> dict:
     
     # Average sentiment for each topic
     average_sentiment = {topic: round(sentiment_by_topic[topic] / count, 2) for topic, count in count_by_topic.items()}
+
+    total_sentiment = sum(sentiment_by_topic[topic] for topic in sentiment_by_topic)
+    total_posts = len(submissions)
+    overall_average_sentiment = round(total_sentiment / total_posts if total_posts > 0 else 0, 2)
     
     # Infer Myers-Briggs personality type
     #mbti = infer_mbti(all_texts)
 
     # Check if RedditUser exists, otherwise create
     reddit_user = RedditUser.query.filter_by(username=username).first()
-    if not reddit_user:
-        reddit_user = RedditUser(username=username, num_submissions=len(submissions))
+    if reddit_user:
+        reddit_user.num_submissions = len(submissions)
+        reddit_user.average_sentiment = overall_average_sentiment
+    else:
+        reddit_user = RedditUser(username=username, num_submissions=len(submissions), average_sentiment=overall_average_sentiment)
         db.session.add(reddit_user)
-        db.session.commit()
+        
+    db.session.commit()
     
     # Store topic distributions
     for topic, distribution in topic_counter.items():
@@ -130,7 +138,8 @@ def get_user_analysis(username):
     result = {
         'topics_distribution': topics_distribution_dict,
         'average_sentiment_by_topic': topic_sentiments_dict,
-        'total_submissions': reddit_user.num_submissions
+        'total_submissions': reddit_user.num_submissions,
+        'overall_average_sentiment': reddit_user.average_sentiment
     }
     
     return result
