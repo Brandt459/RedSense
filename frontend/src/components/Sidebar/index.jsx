@@ -17,6 +17,7 @@ export default function index({ selectedUser, setSelectedUser, setSelectedUserIn
     const [users, setUsers] = useLocalStorage('users', [])
 
     useEffect(() => {
+        setSelectedUserInfo(null)
         if (selectedUser && selectedUser.username) {
             axios.get(`${import.meta.env.VITE_API_URL}/user`, {
                 params: {
