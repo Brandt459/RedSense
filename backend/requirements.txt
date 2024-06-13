@@ -7,3 +7,5 @@ torch
 numpy
 Flask-SQLAlchemy
 Flask-Migrate
+sentence-transformers
+faiss-cpu

@@ -1,12 +1,12 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from collections import Counter
-from transformers import pipeline, BertTokenizer, BertForSequenceClassification
-import torch
-import numpy as np
-from typing import List
+from transformers import pipeline
 from client import reddit
 from db import db
 from models import RedditUser, TopicDistribution, TopicSentiment
+from qa_model import embeddings_model
+import faiss
+from EmbeddingsStore import EmbeddingsStore
 
 
 analyzer = SentimentIntensityAnalyzer()
@@ -97,8 +97,20 @@ def analyze_user_posts(username: str) -> dict:
     total_posts = len(submissions)
     overall_average_sentiment = round(total_sentiment / total_posts if total_posts > 0 else 0, 2)
     
-    # Infer Myers-Briggs personality type
-    #mbti = infer_mbti(all_texts)
+    # Generate embeddings
+    post_embeddings = embeddings_model.encode([f"{submission.title}\n{submission.selftext}" for submission in submissions])
+
+    # Create a FAISS index
+    index = faiss.IndexFlatL2(post_embeddings.shape[1])
+    index.add(post_embeddings)
+
+    # Save embeddings
+    embeddings_store = EmbeddingsStore()
+    embeddings_store.submissions = submissions
+    embeddings_store.embeddings = post_embeddings
+    embeddings_store.index = index
+
+    embeddings_store.save(username)
 
     # Check if RedditUser exists, otherwise create
     reddit_user = RedditUser.query.filter_by(username=username).first()

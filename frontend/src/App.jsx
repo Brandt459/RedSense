@@ -1,14 +1,30 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
     Flex
 } from "@chakra-ui/react"
 import Sidebar from './components/Sidebar'
 import UserAnalysis from './components/UserAnalysis'
+import axios from "axios"
 
 
 function App() {
     const [selectedUser, setSelectedUser] = useState()
     const [selectedUserInfo, setSelectedUserInfo] = useState()
+
+    useEffect(() => {
+        setSelectedUserInfo(null)
+        if (selectedUser && selectedUser.username) {
+            axios.get(`${import.meta.env.VITE_API_URL}/user`, {
+                params: {
+                    username: selectedUser.username
+                }
+            })
+            .then(res => {
+                console.log(res.data)
+                setSelectedUserInfo(res.data)
+            })
+        }
+    }, [selectedUser])
 
     return (
         <Flex
@@ -20,11 +36,9 @@ function App() {
             <Sidebar 
                 selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}
-                setSelectedUserInfo={setSelectedUserInfo}
             />
             <UserAnalysis 
                 selectedUser={selectedUser}
-                setSelectedUser={setSelectedUser}
                 selectedUserInfo={selectedUserInfo}
             />
         </Flex>

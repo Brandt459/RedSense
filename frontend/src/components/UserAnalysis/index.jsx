@@ -7,29 +7,29 @@ import {
     Icon,
     VStack,
     Spinner,
-    Center
+    Center,
+    Divider
 } from "@chakra-ui/react"
 import UserCard from '../UserCard'
 import { FaUser } from "react-icons/fa6"
 import Plot from "react-plotly.js"
 import { BsEmojiLaughingFill, BsEmojiSmileFill, BsEmojiNeutralFill, BsEmojiFrownFill, BsEmojiAngryFill } from "react-icons/bs"
+import QAChat from "./QAChat"
 
 
-export default function index({ selectedUser, setSelectedUser, selectedUserInfo }) {
-    selectedUserInfo = {}
-    selectedUserInfo.overall_average_sentiment = 0
-
+export default function index({ selectedUser, selectedUserInfo }) {
     return (
-        <Box
+        <Flex
+            flexDir="column"
             h="full"
             w="full"
+            overflow="auto"
             p="10"
         >
             {selectedUser &&
                 <>
                     <Flex
                         gap="10"
-                        h="full"
                     >
                         <Box
                             w="80"
@@ -47,7 +47,7 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                 <UserCard 
                                     user={selectedUser}
                                     selectedUser={selectedUser}
-                                    setSelectedUser={setSelectedUser}
+                                    setSelectedUser={() => {}}
                                 />
                             </Box>
                         </Box>
@@ -115,7 +115,7 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                             >
                                                 Overall Attitude
                                             </Text>
-                                            {selectedUserInfo?.overall_average_sentiment &&
+                                            {![null, undefined].includes(selectedUserInfo?.overall_average_sentiment) &&
                                                 <Text
                                                     fontWeight="bold"
                                                     fontSize="28px"
@@ -138,13 +138,14 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                         >
                                             <Icon
                                                 as={
-                                                    !!selectedUserInfo?.overall_average_sentiment ? BsEmojiNeutralFill :
+                                                    [null, undefined].includes(selectedUserInfo?.overall_average_sentiment) ? BsEmojiNeutralFill :
                                                     selectedUserInfo.overall_average_sentiment >= 0.5 ? BsEmojiLaughingFill :
                                                     selectedUserInfo.overall_average_sentiment > 0 ? BsEmojiSmileFill :
                                                     selectedUserInfo.overall_average_sentiment === 0 ? BsEmojiNeutralFill :
                                                     selectedUserInfo.overall_average_sentiment > -0.5 ? BsEmojiFrownFill : BsEmojiAngryFill
                                                 }
                                                 color={
+                                                    [null, undefined].includes(selectedUserInfo?.overall_average_sentiment) ? "gray" :
                                                     selectedUserInfo.overall_average_sentiment === 0 ? "gray" : 
                                                     selectedUserInfo.overall_average_sentiment > 0 ? "#00ff00" : "#ff0000"
                                                 }
@@ -229,7 +230,7 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                                         align="start"
                                                         spacing="1"
                                                     >
-                                                        {selectedUserInfo?.average_sentiment_by_topic &&
+                                                        {![null, undefined].includes(selectedUserInfo?.average_sentiment_by_topic) &&
                                                             Object.keys(selectedUserInfo.average_sentiment_by_topic).map(key => (
                                                                 <Text
                                                                     color="white"
@@ -245,7 +246,7 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                                                         align="start"
                                                         spacing="1"
                                                     >
-                                                        {selectedUserInfo?.average_sentiment_by_topic &&
+                                                        {![null, undefined].includes(selectedUserInfo?.average_sentiment_by_topic) &&
                                                             Object.entries(selectedUserInfo.average_sentiment_by_topic).map(([key, value]) => (
                                                                 <Text
                                                                     color={value === 0 ? "gray" : value > 0 ? "#00ff00" : "#ff0000"}
@@ -280,8 +281,20 @@ export default function index({ selectedUser, setSelectedUser, selectedUserInfo 
                             </Center>
                         }
                     </Flex>
+                    {selectedUserInfo &&
+                        <>
+                            <Box
+                                mt="6"
+                            >
+                                <Divider 
+                                    orientation="horizontal"
+                                />
+                            </Box>
+                            <QAChat />
+                        </>
+                    }
                 </>
             }
-        </Box>
+        </Flex>
     )
 }

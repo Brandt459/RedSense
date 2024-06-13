@@ -3,6 +3,7 @@ from functions import analyze_user_posts, get_user_analysis
 from models import RedditUser
 from client import reddit
 from prawcore.exceptions import NotFound
+from qa_model import global_embeddings_store, prompt
 
 
 route_blueprint = Blueprint('my_blueprint', __name__)
@@ -18,13 +19,18 @@ def get_user():
     
     if not reddit_user:
         analyze_user_posts(username)
+
+    global_embeddings_store.load(username)
     
     return jsonify(get_user_analysis(username))
 
 
 @route_blueprint.route('/analyze_user', methods=['GET'])
 def analyze_user():
-    username = request.args.get('username').lower()
+    username = request.args.get('username', '').lower()
+    if not username:
+        return jsonify({'error': 'Username parameter is required'}), 400
+    
     analyze_user_posts(username)
 
     return jsonify(get_user_analysis(username))
@@ -32,7 +38,7 @@ def analyze_user():
 
 @route_blueprint.route('/profile-photo', methods=['GET'])
 def get_profile_photo():
-    username = request.args.get('username')
+    username = request.args.get('username', '').lower()
     if not username:
         return jsonify({'error': 'Username parameter is required'}), 400
 
@@ -46,3 +52,14 @@ def get_profile_photo():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@route_blueprint.route('/prompt', methods=['POST'])
+def prompt_qa_model():
+    data = request.json
+    question = data.get('question')
+    
+    if not question:
+        return jsonify({'error': 'Question parameter is required'}), 400
+    
+    return jsonify(prompt(question))

@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import {
     Box,
     Flex,
@@ -9,27 +8,11 @@ import {
 } from "@chakra-ui/react"
 import NewUserButton from './NewUserButton'
 import useLocalStorage from 'use-local-storage'
-import axios from 'axios'
 import UserCard from '../UserCard'
 
 
-export default function index({ selectedUser, setSelectedUser, setSelectedUserInfo }) {
+export default function index({ selectedUser, setSelectedUser }) {
     const [users, setUsers] = useLocalStorage('users', [])
-
-    useEffect(() => {
-        setSelectedUserInfo(null)
-        if (selectedUser && selectedUser.username) {
-            axios.get(`${import.meta.env.VITE_API_URL}/user`, {
-                params: {
-                    username: selectedUser.username
-                }
-            })
-            .then(res => {
-                console.log(res.data)
-                setSelectedUserInfo(res.data)
-            })
-        }
-    }, [selectedUser])
 
     return (
         <Box
