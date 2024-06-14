@@ -1,14 +1,12 @@
 from sentence_transformers import SentenceTransformer
 from EmbeddingsStore import EmbeddingsStore
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from openai import OpenAI
 
 
 embeddings_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 global_embeddings_store = EmbeddingsStore()
 
-model_name = "EleutherAI/gpt-j-6B"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-text_generation_model = AutoModelForCausalLM.from_pretrained(model_name)
+client = OpenAI()
 
 
 def retrieve_relevant_posts(question, top_k=5):
@@ -22,9 +20,15 @@ def answer_question_with_retrieval(question, relevant_posts):
     context = "\n".join(relevant_posts)
     input_text = f"Context: {context}\n\nQuestion: {question}\nAnswer:"
 
-    inputs = tokenizer(input_text, return_tensors="pt")
-    outputs = text_generation_model.generate(**inputs, max_length=512, num_return_sequences=1, pad_token_id=tokenizer.eos_token_id)
-    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": input_text}
+        ]
+    )
+
+    generated_text = response.choices[0].message.content.strip()
 
     # Extract the answer part from the generated text
     answer_start = generated_text.find("Answer:") + len("Answer:")

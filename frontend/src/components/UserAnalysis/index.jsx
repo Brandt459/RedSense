@@ -181,6 +181,7 @@ export default function index({ selectedUser, selectedUserInfo }) {
                                                         labels: Object.keys(selectedUserInfo.topics_distribution),
                                                         type: "pie",
                                                         textinfo: "label+percent",
+                                                        hoverinfo: "label+percent",
                                                         textfont: {
                                                             color: "white"
                                                         }
@@ -193,16 +194,12 @@ export default function index({ selectedUser, selectedUserInfo }) {
                                                         plot_bgcolor: 'rgba(0,0,0,0)',
                                                         margin: {
                                                             l: 50,
-                                                            r: 0,
-                                                            b: 0,
+                                                            r: 50,
+                                                            b: 50,
                                                             t: 50,
                                                             pad: 0
                                                         },
-                                                        legend: {
-                                                            font: {
-                                                                color: 'white'
-                                                            }
-                                                        }
+                                                        showlegend: false
                                                     }}
                                                     config={{
                                                         displayModeBar: false,
@@ -221,47 +218,45 @@ export default function index({ selectedUser, selectedUserInfo }) {
                                                 >
                                                     Sentiment
                                                 </Text>
-                                                <Flex
+                                                <VStack
+                                                    spacing="1"
                                                     mt="4"
                                                     overflow="auto"
                                                 >
-                                                    <VStack
-                                                        w="50%"
-                                                        align="start"
-                                                        spacing="1"
-                                                    >
-                                                        {![null, undefined].includes(selectedUserInfo?.average_sentiment_by_topic) &&
-                                                            Object.keys(selectedUserInfo.average_sentiment_by_topic).map(key => (
-                                                                <Text
-                                                                    color="white"
-                                                                    key={key}
+                                                    {![null, undefined].includes(selectedUserInfo?.average_sentiment_by_topic) &&
+                                                        Object.entries(selectedUserInfo.average_sentiment_by_topic).map(([key, value]) => (
+                                                            <Flex
+                                                                w="full"
+                                                                gap="4"
+                                                            >
+                                                                <Box
+                                                                    w="50%"
                                                                 >
-                                                                    {key}
-                                                                </Text>
-                                                            ))
-                                                        }
-                                                    </VStack>
-                                                    <VStack
-                                                        w="50%"
-                                                        align="start"
-                                                        spacing="1"
-                                                    >
-                                                        {![null, undefined].includes(selectedUserInfo?.average_sentiment_by_topic) &&
-                                                            Object.entries(selectedUserInfo.average_sentiment_by_topic).map(([key, value]) => (
-                                                                <Text
-                                                                    color={value === 0 ? "gray" : value > 0 ? "#00ff00" : "#ff0000"}
-                                                                    key={key}
+                                                                    <Text
+                                                                        color="white"
+                                                                        key={key}
+                                                                    >
+                                                                        {key}
+                                                                    </Text>
+                                                                </Box>
+                                                                <Box
+                                                                    w="50%"
                                                                 >
-                                                                    {value === 0 ? 
-                                                                        "Neutral" 
-                                                                        :
-                                                                        `${value > 0 ? '+' : '-'}${parseFloat(Math.abs(value * 100).toFixed(2))}%`
-                                                                    }
-                                                                </Text>
-                                                            ))
-                                                        }
-                                                    </VStack>
-                                                </Flex>
+                                                                    <Text
+                                                                        color={value === 0 ? "gray" : value > 0 ? "#00ff00" : "#ff0000"}
+                                                                        key={key}
+                                                                    >
+                                                                        {value === 0 ? 
+                                                                            "Neutral" 
+                                                                            :
+                                                                            `${value > 0 ? '+' : '-'}${parseFloat(Math.abs(value * 100).toFixed(2))}%`
+                                                                        }
+                                                                    </Text>
+                                                                </Box>
+                                                            </Flex>
+                                                        ))
+                                                    }
+                                                </VStack>
                                             </Flex>
                                         </Flex>
                                     </Box>
@@ -273,7 +268,7 @@ export default function index({ selectedUser, selectedUserInfo }) {
                                 height="full"
                             >
                                 <Spinner 
-                                    color="brightBlue"
+                                    color="primary"
                                     w="250px"
                                     h="250px"
                                     thickness="15px"

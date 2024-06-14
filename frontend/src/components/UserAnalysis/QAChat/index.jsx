@@ -76,7 +76,7 @@ export default function index({ selectedUser }) {
                     <Box 
                         key={index} 
                         p="2" 
-                        bg={message.sender === "user" ? "darkBlue" : "brightBlue"}
+                        bg={message.sender === "user" ? "darkBlue" : "primary"}
                         borderRadius="md" 
                         alignSelf={message.sender === 'user' ? 'flex-start' : 'flex-end'}
                         wordBreak="break-word"
@@ -92,7 +92,7 @@ export default function index({ selectedUser }) {
                 {isLoading && (
                     <Box 
                         p="2" 
-                        bg="brightBlue" 
+                        bg="primary" 
                         borderRadius="md" 
                         alignSelf="flex-end"
                     >
@@ -108,25 +108,6 @@ export default function index({ selectedUser }) {
                 onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} 
                 mt="4"
             >
-                {/* <TextareaAutosize
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Type your message..."
-                    isDisabled={isLoading}
-                    resize="none"
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        borderRadius: '5px',
-                        border: '1px solid #E2E8F0',
-                        marginBottom: '10px',
-                        boxSizing: 'border-box',
-                        background: "#273142",
-                        border: "none",
-                        ring: "0"
-                    }}
-                /> */}
                 <Box
                     as={TextareaAutosize}
                     value={input}

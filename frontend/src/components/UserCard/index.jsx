@@ -20,9 +20,9 @@ export default function index({ user, selectedUser, setSelectedUser }) {
             color="white"
             alignItems="center"
             cursor="pointer"
-            backgroundColor={(selectedUser && selectedUser.username === user.username) ? "rgba(72, 128, 255, 1)" : "rgba(72, 128, 255, 0)"}
+            backgroundColor={(selectedUser && selectedUser.username === user.username) ? "rgba(255, 69, 0, 1)" : "rgba(255, 69, 0, 0)"}
             _hover={{
-                backgroundColor: (selectedUser && selectedUser.username === user.username) ? "rgba(72, 128, 255, 1)" : "rgba(72, 128, 255, 0.5)"
+                backgroundColor: (selectedUser && selectedUser.username === user.username) ? "rgba(255, 69, 0, 1)" : "rgba(255, 69, 0, 0.5)"
             }}
             transitionProperty="background-color"
             transitionDuration="0.3s"

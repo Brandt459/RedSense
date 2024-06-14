@@ -14,7 +14,7 @@ function App() {
     useEffect(() => {
         setSelectedUserInfo(null)
         if (selectedUser && selectedUser.username) {
-            axios.get(`${import.meta.env.VITE_API_URL}/analyze_user`, {
+            axios.get(`${import.meta.env.VITE_API_URL}/user`, {
                 params: {
                     username: selectedUser.username
                 }

@@ -67,8 +67,8 @@ export default function index({ users, setUsers }) {
                 w="200px"
                 h="50px"
                 mt="8"
-                bg="brightBlue"
-                colorScheme="blue"
+                bg="primary"
+                colorScheme="orange"
                 gap="4"
                 onClick={onOpen}
             >
@@ -155,8 +155,8 @@ export default function index({ users, setUsers }) {
                                     Cancel
                                 </Button>
                                 <Button 
-                                    colorScheme='blue'
-                                    bg="brightBlue"
+                                    colorScheme='orange'
+                                    bg="primary"
                                     w="1/2"
                                     type="submit"
                                 >

@@ -27,11 +27,11 @@ export default function index({ selectedUser, setSelectedUser }) {
                 pt="4"
             >
                 <Heading
-                    color="brightBlue"
+                    color="primary"
                     fontWeight="extrabold"
                     fontSize="32px"
                 >
-                    Twit
+                    Red
                 </Heading>
                 <Heading
                     color="white"
