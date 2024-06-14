@@ -69,7 +69,7 @@ def infer_mbti(posts: List[str]) -> str:
 
 def analyze_user_posts(username: str) -> dict:
     user = reddit.redditor(username)
-    submissions = list(user.submissions.new(limit=5))
+    submissions = list(user.submissions.new(limit=20))
     
     # Initialize counters and storage
     topic_counter = Counter()
@@ -98,7 +98,8 @@ def analyze_user_posts(username: str) -> dict:
     overall_average_sentiment = round(total_sentiment / total_posts if total_posts > 0 else 0, 2)
     
     # Generate embeddings
-    post_embeddings = embeddings_model.encode([f"{submission.title}\n{submission.selftext}" for submission in submissions])
+    formatted_submissions = [f"{submission.title}\n{submission.selftext}" for submission in submissions]
+    post_embeddings = embeddings_model.encode(formatted_submissions)
 
     # Create a FAISS index
     index = faiss.IndexFlatL2(post_embeddings.shape[1])
@@ -106,7 +107,7 @@ def analyze_user_posts(username: str) -> dict:
 
     # Save embeddings
     embeddings_store = EmbeddingsStore()
-    embeddings_store.submissions = submissions
+    embeddings_store.submissions = formatted_submissions
     embeddings_store.embeddings = post_embeddings
     embeddings_store.index = index
 

@@ -10,7 +10,7 @@ import TextareaAutosize from 'react-textarea-autosize'
 import axios from 'axios'
 
 
-export default function index() {
+export default function index({ selectedUser }) {
     const [messages, setMessages] = useState([])
     const [input, setInput] = useState('')
     const chatContainerRef = useRef(null)
@@ -24,7 +24,8 @@ export default function index() {
             setIsLoading(true)
             
             axios.post(`${import.meta.env.VITE_API_URL}/prompt`, {
-                question: input
+                question: input,
+                username: selectedUser.username
             })
             .then(res => {
                 setIsLoading(false)

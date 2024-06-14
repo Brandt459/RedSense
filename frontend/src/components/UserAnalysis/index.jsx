@@ -290,7 +290,9 @@ export default function index({ selectedUser, selectedUserInfo }) {
                                     orientation="horizontal"
                                 />
                             </Box>
-                            <QAChat />
+                            <QAChat 
+                                selectedUser={selectedUser}
+                            />
                         </>
                     }
                 </>

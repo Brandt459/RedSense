@@ -1,11 +1,14 @@
 from sentence_transformers import SentenceTransformer
 from EmbeddingsStore import EmbeddingsStore
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
 embeddings_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 global_embeddings_store = EmbeddingsStore()
-qa_pipeline = pipeline('question-answering', model='distilbert-base-uncased-distilled-squad')
+
+model_name = "EleutherAI/gpt-j-6B"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+text_generation_model = AutoModelForCausalLM.from_pretrained(model_name)
 
 
 def retrieve_relevant_posts(question, top_k=5):
@@ -17,10 +20,20 @@ def retrieve_relevant_posts(question, top_k=5):
 
 def answer_question_with_retrieval(question, relevant_posts):
     context = "\n".join(relevant_posts)
-    result = qa_pipeline(question=question, context=context)
-    return result['answer']
+    input_text = f"Context: {context}\n\nQuestion: {question}\nAnswer:"
+
+    inputs = tokenizer(input_text, return_tensors="pt")
+    outputs = text_generation_model.generate(**inputs, max_length=512, num_return_sequences=1, pad_token_id=tokenizer.eos_token_id)
+    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+    # Extract the answer part from the generated text
+    answer_start = generated_text.find("Answer:") + len("Answer:")
+    answer = generated_text[answer_start:].strip()
+
+    return answer
 
 
 def prompt(question):
     relevant_posts = retrieve_relevant_posts(question)
+    print(relevant_posts)
     return answer_question_with_retrieval(question, relevant_posts)

@@ -58,8 +58,15 @@ def get_profile_photo():
 def prompt_qa_model():
     data = request.json
     question = data.get('question')
+    username = data.get('username')
     
     if not question:
         return jsonify({'error': 'Question parameter is required'}), 400
+    
+    if not username:
+        return jsonify({'error': 'Username parameter is required'}), 400
+    
+    if global_embeddings_store.username != username:
+        global_embeddings_store.load(username)
     
     return jsonify(prompt(question))
