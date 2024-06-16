@@ -16,28 +16,23 @@ def retrieve_relevant_posts(question, top_k=5):
     return relevant_posts
 
 
-def answer_question_with_retrieval(question, relevant_posts):
+def answer_question_with_retrieval(question, messages, relevant_posts):
     context = "\n".join(relevant_posts)
     input_text = f"Context: {context}\n\nQuestion: {question}\nAnswer:"
 
+    all_messages = [{"role": "system", "content": "You are a helpful assistant."}] + messages + [{"role": "user", "content": input_text}]
+
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": input_text}
-        ]
+        messages=all_messages
     )
 
-    generated_text = response.choices[0].message.content.strip()
-
-    # Extract the answer part from the generated text
-    answer_start = generated_text.find("Answer:") + len("Answer:")
-    answer = generated_text[answer_start:].strip()
+    answer = response.choices[0].message.content.strip()
 
     return answer
 
 
-def prompt(question):
+def prompt(question, messages):
     relevant_posts = retrieve_relevant_posts(question)
     print(relevant_posts)
-    return answer_question_with_retrieval(question, relevant_posts)
+    return answer_question_with_retrieval(question, messages, relevant_posts)

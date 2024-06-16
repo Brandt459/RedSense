@@ -19,22 +19,23 @@ export default function index({ selectedUser }) {
 
     const handleSendMessage = () => {
         if (input.trim()) {
-            setMessages([...messages, { text: input, sender: 'user' }])
+            setMessages([...messages, { content: input, role: 'user' }])
             setInput('')
             setIsLoading(true)
             
             axios.post(`${import.meta.env.VITE_API_URL}/prompt`, {
                 question: input,
-                username: selectedUser.username
+                username: selectedUser.username,
+                messages: messages
             })
             .then(res => {
                 setIsLoading(false)
-                const modelResponse = { text: res.data, sender: 'model' }
+                const modelResponse = { content: res.data, role: 'assistant' }
                 setMessages((prevMessages) => [...prevMessages, modelResponse])
             })
             .catch(error => {
                 setIsLoading(false)
-                const modelResponse = { text: error.message, sender: 'model' }
+                const modelResponse = { content: error.message, role: 'assistant' }
                 setMessages((prevMessages) => [...prevMessages, modelResponse])
             })
         }
@@ -76,16 +77,16 @@ export default function index({ selectedUser }) {
                     <Box 
                         key={index} 
                         p="2" 
-                        bg={message.sender === "user" ? "darkBlue" : "primary"}
+                        bg={message.role === "user" ? "darkBlue" : "primary"}
                         borderRadius="md" 
-                        alignSelf={message.sender === 'user' ? 'flex-start' : 'flex-end'}
+                        alignSelf={message.role === 'user' ? 'flex-start' : 'flex-end'}
                         wordBreak="break-word"
                         whiteSpace="pre-wrap"
                     >
                         <Text
                             color="white"
                         >
-                            {message.text}
+                            {message.content}
                         </Text>
                     </Box>
                 ))}

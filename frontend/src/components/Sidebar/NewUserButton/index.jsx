@@ -57,6 +57,9 @@ export default function index({ users, setUsers }) {
             })
             .catch(error => {
                 console.log(error)
+                if (error?.response?.data?.message) {
+                    setError(error.response.data.message)
+                }
             })
         }
     }

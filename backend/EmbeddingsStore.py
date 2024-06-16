@@ -15,11 +15,21 @@ class EmbeddingsStore:
 
 
     def load(self, username):
-        self.embeddings = np.load(f"{self.embeddings_path_prefix}/{username}.npy")
-        self.index = faiss.read_index(f"{self.indexes_path_prefix}/{username}.index")
-        
-        with open(f"{self.submissions_path_prefix}/{username}.pkl", 'rb') as f:
-            self.submissions = pickle.load(f)
+        try:
+            self.embeddings = np.load(f"{self.embeddings_path_prefix}/{username}.npy")
+        except:
+            self.embeddings = None
+
+        try:
+            self.index = faiss.read_index(f"{self.indexes_path_prefix}/{username}.index")
+        except:
+            self.index = None
+
+        try:
+            with open(f"{self.submissions_path_prefix}/{username}.pkl", 'rb') as f:
+                self.submissions = pickle.load(f)
+        except:
+            self.submissions = None
         
         self.username = username
 

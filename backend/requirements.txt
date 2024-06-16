@@ -10,3 +10,4 @@ Flask-Migrate
 sentence-transformers
 faiss-cpu
 openai
+flask-cors

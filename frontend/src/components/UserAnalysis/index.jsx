@@ -276,7 +276,7 @@ export default function index({ selectedUser, selectedUserInfo }) {
                             </Center>
                         }
                     </Flex>
-                    {selectedUserInfo &&
+                    {selectedUserInfo && selectedUserInfo.qa_model_available &&
                         <>
                             <Box
                                 mt="6"

@@ -6,3 +6,4 @@ class RedditUser(db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     num_submissions = db.Column(db.Integer)
     average_sentiment = db.Column(db.Float)
+    qa_model_available = db.Column(db.Boolean, default=False)

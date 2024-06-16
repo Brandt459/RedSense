@@ -13,6 +13,7 @@ import UserCard from '../UserCard'
 
 export default function index({ selectedUser, setSelectedUser }) {
     const [users, setUsers] = useLocalStorage('users', [])
+    console.log(users)
 
     return (
         <Box

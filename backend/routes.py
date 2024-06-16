@@ -48,7 +48,7 @@ def get_profile_photo():
         return jsonify({'username': username, 'profile_photo_url': profile_photo_url})
     
     except NotFound:
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({'message': f'User "{username}" not found'}), 404
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -59,6 +59,7 @@ def prompt_qa_model():
     data = request.json
     question = data.get('question')
     username = data.get('username')
+    messages = data.get('messages', [])
     
     if not question:
         return jsonify({'error': 'Question parameter is required'}), 400
@@ -69,4 +70,4 @@ def prompt_qa_model():
     if global_embeddings_store.username != username:
         global_embeddings_store.load(username)
     
-    return jsonify(prompt(question))
+    return jsonify(prompt(question, messages))

@@ -22,52 +22,15 @@ def categorize_text(text: str) -> dict:
     return classifier(text, candidate_labels)
 
 
-""" tokenizer = BertTokenizer.from_pretrained('harrisonzhuo/BERT-MBTI')
-model = BertForSequenceClassification.from_pretrained('harrisonzhuo/BERT-MBTI')
-
-# MBTI types as per the model's training
-mbti_types = ['INFP', 'INFJ', 'INTP', 'INTJ', 'ISFP', 'ISFJ', 'ISTP', 'ISTJ', 
-              'ENFP', 'ENFJ', 'ENTP', 'ENTJ', 'ESFP', 'ESFJ', 'ESTP', 'ESTJ']
-
-# Returns confidence score for each MBTI type based on post
-def predict_mbti_with_confidence(text: str) -> List[float]:
-    inputs = tokenizer(text, return_tensors='pt', truncation=True, padding=True, max_length=512)
-    with torch.no_grad():
-        outputs = model(**inputs)
-
-    logits = outputs.logits
-    probabilities = torch.softmax(logits, dim=1).cpu().numpy()
-    return probabilities[0]
-
-
-def infer_mbti(posts: List[str]) -> str:
-    # Predict MBTI types with confidence scores and calculate weights for each post
-    weighted_scores = np.zeros((len(mbti_types),))
-    total_weight = 0
-
-    for post in posts:
-        probabilities = predict_mbti_with_confidence(post)
-        weight = max(probabilities)     # Weigh overall MBTI calculation by individual post mbti confidence
-        weighted_scores += probabilities * weight
-        total_weight += weight
-
-    # Calculate the weighted average confidence scores
-    average_confidence_scores = weighted_scores / total_weight if total_weight != 0 else weighted_scores
-
-    # Determine the most likely MBTI type
-    most_likely_mbti_index = np.argmax(average_confidence_scores)
-    most_likely_mbti = mbti_types[most_likely_mbti_index]
-
-    # Print the results
-    print(f"Most Likely MBTI: {most_likely_mbti}")
-    print("Weighted Average Confidence Scores:")
-    for mbti, score in zip(mbti_types, average_confidence_scores):
-        print(f"{mbti}: {score:.4f}")
-
-    return most_likely_mbti """
-
-
 def analyze_user_posts(username: str) -> dict:
+    # Check if RedditUser exists, otherwise create
+    reddit_user = RedditUser.query.filter_by(username=username).first()
+    if not reddit_user:
+        reddit_user = RedditUser(username=username)
+        db.session.add(reddit_user)
+        db.session.commit()
+    
+    # Get reddit user submissions
     user = reddit.redditor(username)
     submissions = list(user.submissions.new(limit=20))
     
@@ -97,32 +60,30 @@ def analyze_user_posts(username: str) -> dict:
     total_posts = len(submissions)
     overall_average_sentiment = round(total_sentiment / total_posts if total_posts > 0 else 0, 2)
     
-    # Generate embeddings
-    formatted_submissions = [f"{submission.title}\n{submission.selftext}" for submission in submissions]
-    post_embeddings = embeddings_model.encode(formatted_submissions)
+    qa_model_available = False
+    if len(submissions) > 0:
+        # Generate embeddings
+        formatted_submissions = [f"{submission.title}\n{submission.selftext}" for submission in submissions]
+        post_embeddings = embeddings_model.encode(formatted_submissions)
 
-    # Create a FAISS index
-    index = faiss.IndexFlatL2(post_embeddings.shape[1])
-    index.add(post_embeddings)
+        # Create a FAISS index
+        index = faiss.IndexFlatL2(post_embeddings.shape[1])
+        index.add(post_embeddings)
 
-    # Save embeddings
-    embeddings_store = EmbeddingsStore()
-    embeddings_store.submissions = formatted_submissions
-    embeddings_store.embeddings = post_embeddings
-    embeddings_store.index = index
+        # Save embeddings
+        embeddings_store = EmbeddingsStore()
+        embeddings_store.submissions = formatted_submissions
+        embeddings_store.embeddings = post_embeddings
+        embeddings_store.index = index
 
-    embeddings_store.save(username)
+        embeddings_store.save(username)
 
-    # Check if RedditUser exists, otherwise create
-    reddit_user = RedditUser.query.filter_by(username=username).first()
-    if reddit_user:
-        reddit_user.num_submissions = len(submissions)
-        reddit_user.average_sentiment = overall_average_sentiment
-    else:
-        reddit_user = RedditUser(username=username, num_submissions=len(submissions), average_sentiment=overall_average_sentiment)
-        db.session.add(reddit_user)
-        
-    db.session.commit()
+        qa_model_available = True
+
+    # Save stats to reddit user model
+    reddit_user.num_submissions = len(submissions)
+    reddit_user.average_sentiment = overall_average_sentiment
+    reddit_user.qa_model_available = qa_model_available
     
     # Store topic distributions
     for topic, distribution in topic_counter.items():
@@ -137,7 +98,7 @@ def analyze_user_posts(username: str) -> dict:
     db.session.commit()
 
 
-def get_user_analysis(username):
+def get_user_analysis(username: str):
     reddit_user = RedditUser.query.filter_by(username=username).first()
     
     # Retrieve topic distributions from database
@@ -152,7 +113,8 @@ def get_user_analysis(username):
         'topics_distribution': topics_distribution_dict,
         'average_sentiment_by_topic': topic_sentiments_dict,
         'total_submissions': reddit_user.num_submissions,
-        'overall_average_sentiment': reddit_user.average_sentiment
+        'overall_average_sentiment': reddit_user.average_sentiment,
+        'qa_model_available': reddit_user.qa_model_available
     }
     
     return result
