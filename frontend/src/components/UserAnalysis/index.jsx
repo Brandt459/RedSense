@@ -266,6 +266,8 @@ export default function index({ selectedUser, selectedUserInfo }) {
                             <Center 
                                 width="full" 
                                 height="full"
+                                display="flex"
+                                flexDir="column"
                             >
                                 <Spinner 
                                     color="primary"
@@ -273,6 +275,13 @@ export default function index({ selectedUser, selectedUserInfo }) {
                                     h="250px"
                                     thickness="15px"
                                 />
+                                <Text
+                                    color="white"
+                                    fontSize="32px"
+                                    mt="4"
+                                >
+                                    Analyzing user, this may take 2-3 minutes
+                                </Text>
                             </Center>
                         }
                     </Flex>

@@ -7,6 +7,8 @@ from models import RedditUser, TopicDistribution, TopicSentiment
 from qa_model import embeddings_model
 import faiss
 from EmbeddingsStore import EmbeddingsStore
+from state import lock_and_get_state
+import time
 
 
 analyzer = SentimentIntensityAnalyzer()
@@ -20,6 +22,20 @@ def categorize_text(text: str) -> dict:
         'health and fitness', 'science', 'education', 'finance and cryptocurrency', 'lifestyle and hobbies'
     ]
     return classifier(text, candidate_labels)
+
+
+# Keeps from running multiple analyses on the same user
+def analyze_user_posts_safe(username: str):
+    user_state = lock_and_get_state(username)
+
+    if user_state['analyzing_posts']:
+        while user_state['analyzing_posts']:
+            time.sleep(1)
+    
+    else:
+        user_state['analyzing_posts'] = True
+        analyze_user_posts(username)
+        user_state['analyzing_posts'] = False
 
 
 def analyze_user_posts(username: str) -> dict:

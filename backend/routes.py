@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from functions import analyze_user_posts, get_user_analysis
+from functions import analyze_user_posts_safe, get_user_analysis
 from models import RedditUser
 from client import reddit
 from prawcore.exceptions import NotFound
@@ -18,7 +18,7 @@ def get_user():
     reddit_user = RedditUser.query.filter_by(username=username).first()
     
     if not reddit_user:
-        analyze_user_posts(username)
+        analyze_user_posts_safe(username)
 
     global_embeddings_store.load(username)
     
@@ -27,11 +27,13 @@ def get_user():
 
 @route_blueprint.route('/analyze_user', methods=['GET'])
 def analyze_user():
+    print('analyze user endpoint called')
+    
     username = request.args.get('username', '').lower()
     if not username:
         return jsonify({'error': 'Username parameter is required'}), 400
     
-    analyze_user_posts(username)
+    analyze_user_posts_safe(username)
 
     return jsonify(get_user_analysis(username))
 

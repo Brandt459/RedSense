@@ -20,7 +20,6 @@ migrate = Migrate(app, db)
 
 app.register_blueprint(route_blueprint)
 
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
