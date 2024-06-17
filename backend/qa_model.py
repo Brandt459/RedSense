@@ -42,5 +42,4 @@ def answer_question_with_retrieval(question, messages, relevant_posts):
 
 def prompt(question, messages):
     relevant_posts = retrieve_relevant_posts(question)
-    print(relevant_posts)
     return answer_question_with_retrieval(question, messages, relevant_posts)

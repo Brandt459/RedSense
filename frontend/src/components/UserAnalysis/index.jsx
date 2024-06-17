@@ -8,16 +8,38 @@ import {
     VStack,
     Spinner,
     Center,
-    Divider
+    Divider,
+    Button
 } from "@chakra-ui/react"
 import UserCard from '../UserCard'
 import { FaUser } from "react-icons/fa6"
 import Plot from "react-plotly.js"
 import { BsEmojiLaughingFill, BsEmojiSmileFill, BsEmojiNeutralFill, BsEmojiFrownFill, BsEmojiAngryFill } from "react-icons/bs"
 import QAChat from "./QAChat"
+import axios from 'axios'
 
 
-export default function index({ selectedUser, selectedUserInfo }) {
+export default function index({ selectedUser, selectedUserInfo, setSelectedUserInfo }) {
+    const rerunAnalysis = () => {
+        if (selectedUser) {
+            setSelectedUserInfo(null)
+
+            axios.get(`${import.meta.env.VITE_API_URL}/analyze_user`, {
+                params: {
+                    username: selectedUser.username
+                }
+            })
+            .then(res => {
+                console.log(res.data)
+                setSelectedUserInfo(res.data)
+            })
+            .catch(error => {
+                console.log(error)
+                setSelectedUser(null)
+            })
+        }
+    }
+
     return (
         <Flex
             flexDir="column"
@@ -50,6 +72,21 @@ export default function index({ selectedUser, selectedUserInfo }) {
                                     setSelectedUser={() => {}}
                                 />
                             </Box>
+                            {selectedUserInfo &&
+                                <Button
+                                    m="4"
+                                    w="200px"
+                                    h="50px"
+                                    bg="none"
+                                    color="white"
+                                    borderColor="slateBlue"
+                                    borderWidth="2px"
+                                    colorScheme='whiteAlpha'
+                                    onClick={rerunAnalysis}
+                                >
+                                    Rerun Analysis
+                                </Button>
+                            }
                         </Box>
                         {selectedUserInfo ?
                             <>

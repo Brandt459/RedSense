@@ -44,6 +44,7 @@ function App() {
             <UserAnalysis 
                 selectedUser={selectedUser}
                 selectedUserInfo={selectedUserInfo}
+                setSelectedUserInfo={setSelectedUserInfo}
             />
         </Flex>
     )
