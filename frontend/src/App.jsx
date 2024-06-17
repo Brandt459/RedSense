@@ -23,6 +23,10 @@ function App() {
                 console.log(res.data)
                 setSelectedUserInfo(res.data)
             })
+            .catch(error => {
+                console.log(error)
+                setSelectedUser(null)
+            })
         }
     }, [selectedUser])
 

@@ -1,27 +1,39 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from collections import Counter
-from transformers import pipeline
 from client import reddit
 from db import db
 from models import RedditUser, TopicDistribution, TopicSentiment
-from qa_model import embeddings_model
+from qa_model import get_openai_embeddings
 import faiss
 from EmbeddingsStore import EmbeddingsStore
 from state import lock_and_get_state
 import time
+import os
+import requests
 
 
 analyzer = SentimentIntensityAnalyzer()
-classifier = pipeline('zero-shot-classification', model='facebook/bart-large-mnli')
 
 
 # Return most likely topic for a post
 def categorize_text(text: str) -> dict:
-    candidate_labels = [
-        'technology', 'gaming', 'entertainment', 'sports', 'news and current events',
-        'health and fitness', 'science', 'education', 'finance and cryptocurrency', 'lifestyle and hobbies'
-    ]
-    return classifier(text, candidate_labels)
+    response = requests.post(
+        "https://api-inference.huggingface.co/models/facebook/bart-large-mnli", 
+        headers={
+            "Authorization": f"Bearer {os.getenv('HUGGINGFACE_API_KEY')}"
+        }, 
+        json={
+            "inputs": text,
+            "parameters": {
+                "candidate_labels": [
+                    'technology', 'gaming', 'entertainment', 'sports', 'news and current events',
+                    'health and fitness', 'science', 'education', 'finance and cryptocurrency', 'lifestyle and hobbies'
+                ]
+            }
+        }
+    )
+
+    return response.json()
 
 
 # Keeps from running multiple analyses on the same user
@@ -56,8 +68,10 @@ def analyze_user_posts(username: str) -> dict:
     count_by_topic = Counter()
     all_texts = []
     
+    # Get sentiment and topic for each post, calculate topic distribution and average sentiment per topic
     for submission in submissions:
         post = f"{submission.title}\n{submission.selftext}"
+
         topic_distribution = categorize_text(post)
         sentiment = analyzer.polarity_scores(post)['compound']
         
@@ -80,7 +94,7 @@ def analyze_user_posts(username: str) -> dict:
     if len(submissions) > 0:
         # Generate embeddings
         formatted_submissions = [f"{submission.title}\n{submission.selftext}" for submission in submissions]
-        post_embeddings = embeddings_model.encode(formatted_submissions)
+        post_embeddings = get_openai_embeddings(formatted_submissions)
 
         # Create a FAISS index
         index = faiss.IndexFlatL2(post_embeddings.shape[1])

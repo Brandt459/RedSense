@@ -1,16 +1,24 @@
-from sentence_transformers import SentenceTransformer
 from EmbeddingsStore import EmbeddingsStore
 from openai import OpenAI
+import numpy as np
 
 
-embeddings_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 global_embeddings_store = EmbeddingsStore()
-
 client = OpenAI()
 
 
+def get_openai_embeddings(text_list):
+    response = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=text_list
+    )
+    embeddings = [data.embedding for data in response.data]
+    embeddings_matrix = np.array(embeddings).astype('float32')
+    return embeddings_matrix
+
+
 def retrieve_relevant_posts(question, top_k=5):
-    question_embedding = embeddings_model.encode([question])
+    question_embedding = get_openai_embeddings([question])
     _, indices = global_embeddings_store.index.search(question_embedding, top_k)
     relevant_posts = [global_embeddings_store.submissions[i] for i in indices[0]]
     return relevant_posts
