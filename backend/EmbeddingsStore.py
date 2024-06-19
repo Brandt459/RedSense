@@ -18,17 +18,20 @@ class EmbeddingsStore:
         try:
             self.embeddings = np.load(f"{self.embeddings_path_prefix}/{username}.npy")
         except:
+            print('Could not load embeddings')
             self.embeddings = None
 
         try:
             self.index = faiss.read_index(f"{self.indexes_path_prefix}/{username}.index")
         except:
+            print('Could not load index')
             self.index = None
 
         try:
             with open(f"{self.submissions_path_prefix}/{username}.pkl", 'rb') as f:
                 self.submissions = pickle.load(f)
         except:
+            print('Could not load submissions')
             self.submissions = None
         
         self.username = username
