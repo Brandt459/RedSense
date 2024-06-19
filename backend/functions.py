@@ -71,15 +71,16 @@ def analyze_user_posts(username: str) -> dict:
     # Get sentiment and topic for each post, calculate topic distribution and average sentiment per topic
     for submission in submissions:
         post = f"{submission.title}\n{submission.selftext}"
-
         topic_distribution = categorize_text(post)
-        sentiment = analyzer.polarity_scores(post)['compound']
-        
-        for label, score in zip(topic_distribution['labels'], topic_distribution['scores']):
-            if score > 0.2:
-                topic_counter[label] += score
-                sentiment_by_topic[label] += sentiment * score
-                count_by_topic[label] += score
+
+        if 'labels' in topic_distribution and 'scores' in topic_distribution:
+            sentiment = analyzer.polarity_scores(post)['compound']
+
+            for label, score in zip(topic_distribution['labels'], topic_distribution['scores']):
+                if score > 0.2:
+                    topic_counter[label] += score
+                    sentiment_by_topic[label] += sentiment * score
+                    count_by_topic[label] += score
 
         all_texts.append(post)
     

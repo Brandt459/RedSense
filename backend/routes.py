@@ -26,9 +26,7 @@ def get_user():
 
 
 @route_blueprint.route('/analyze_user', methods=['GET'])
-def analyze_user():
-    print('analyze user endpoint called')
-    
+def analyze_user():    
     username = request.args.get('username', '').lower()
     if not username:
         return jsonify({'error': 'Username parameter is required'}), 400
