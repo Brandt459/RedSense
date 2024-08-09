@@ -46,6 +46,7 @@ export default function index({ selectedUser, setSelectedUser }) {
                 <NewUserButton 
                     users={users}
                     setUsers={setUsers}
+                    setSelectedUser={setSelectedUser}
                 />
             </Center>
             <Box

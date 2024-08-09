@@ -24,7 +24,7 @@ import { FaUserPlus } from "react-icons/fa"
 import axios from 'axios'
 
 
-export default function index({ users, setUsers }) {
+export default function index({ users, setUsers, setSelectedUser }) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [username, setUsername] = useState('')
     const [error, setError] = useState('')
@@ -53,6 +53,7 @@ export default function index({ users, setUsers }) {
                 }
     
                 setUsers(prev => [ ...prev, user ])
+                setSelectedUser(user)
                 handleClose()
             })
             .catch(error => {

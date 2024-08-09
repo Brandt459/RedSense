@@ -35,7 +35,7 @@ export default function index({ selectedUser, selectedUserInfo, setSelectedUserI
             })
             .catch(error => {
                 console.log(error)
-                setSelectedUser(null)
+                setSelectedUserInfo(null)
             })
         }
     }
